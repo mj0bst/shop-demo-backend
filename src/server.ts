@@ -1,22 +1,28 @@
-import "dotenv/config"
+require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` });
 import express from "express";
+import baseImport from "./model/baseImport";
+import dbInit from "./model/init";
 
-const app = express();
+dbInit().then(async () => {
+  await baseImport();
 
-// mount the frontend
-app.use(express.static("frontend/build"));
+  const app = express();
 
-// parse requests of content-type - application/json
-app.use(express.json());
+  // mount the frontend
+  app.use(express.static("frontend/build"));
 
-const port = process.env.PORT; // default port to listen
+  // parse requests of content-type - application/json
+  app.use(express.json());
 
-// define a route handler for the default home page
-app.get( "/api/hello", ( req, res ) => {
-    res.send( "Hello world!" );
-} );
+  const port = process.env.PORT; // default port to listen
 
-// start the Express server
-app.listen( port, () => {
-    console.log( `server started at http://localhost:${ port }` );
-} );
+  // define a route handler for the default home page
+  app.get("/api/hello", (req, res) => {
+    res.send("Hello world!");
+  });
+
+  // start the Express server
+  app.listen(port, () => {
+    console.log(`server started at http://localhost:${port}`);
+  });
+});
