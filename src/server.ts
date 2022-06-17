@@ -2,6 +2,7 @@ require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` });
 import express from "express";
 import baseImport from "./model/baseImport";
 import dbInit from "./model/init";
+import shopItemRoute from "./route/shopItemRoute";
 
 dbInit().then(async () => {
   await baseImport();
@@ -20,6 +21,9 @@ dbInit().then(async () => {
   app.get("/api/hello", (req, res) => {
     res.send("Hello world!");
   });
+
+  // add the shop item routes
+  shopItemRoute(app);
 
   // start the Express server
   app.listen(port, () => {
