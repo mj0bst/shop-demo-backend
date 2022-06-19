@@ -1,8 +1,10 @@
 require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` });
 import express from "express";
+import cors from "cors";
 import baseImport from "./model/baseImport";
 import dbInit from "./model/init";
 import shopItemRoute from "./route/shopItemRoute";
+import path from 'path';
 
 dbInit().then(async () => {
   await baseImport();
@@ -12,18 +14,28 @@ dbInit().then(async () => {
   // mount the frontend
   app.use(express.static("frontend/build"));
 
+  // use cors in order to run frontend and backend separately in dev
+  if (process.env.NODE_ENV === "development.local") {
+    app.use(
+      cors({
+        origin: "http://localhost:3000",
+      })
+    );
+  }
+
   // parse requests of content-type - application/json
   app.use(express.json());
 
   const port = process.env.PORT; // default port to listen
 
-  // define a route handler for the default home page
-  app.get("/api/hello", (req, res) => {
-    res.send("Hello world!");
-  });
-
   // add the shop item routes
   shopItemRoute(app);
+
+  // mount the frontend
+  app.use("/static", express.static(path.join(__dirname, "../frontend/build/static")));
+  app.get("*", function (req, res) {
+    res.sendFile("index.html", { root: path.join(__dirname, "../frontend/build/") });
+  });
 
   // start the Express server
   app.listen(port, () => {

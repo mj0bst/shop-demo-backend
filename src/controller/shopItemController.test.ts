@@ -1,27 +1,27 @@
 import * as express from "express";
 import { Op } from "sequelize";
 
-import ShopItem from "../../src/model/shopItem";
+import ShopItem from "../model/shopItem";
 const create = jest.fn();
 const findAll = jest.fn();
-jest.mock("../../src/model/shopItem", () => {
+jest.mock("../model/shopItem", () => {
   return { create, findAll };
 });
 
-import * as shopItemController from "../../src/controller/shopItemController";
+import * as shopItemController from "./shopItemController";
 
 const shopItemWithoutId = {
   name: "item",
   description: "this is an item",
   price: 1.2,
-  count: 10,
+  stock: 10,
 };
 const shopItemWithId = {
   id: "this-is-a-uuid",
   name: "item",
   description: "this is an item",
   price: 1.2,
-  count: 10,
+  stock: 10,
 };
 
 describe("ShopItem controller", () => {
@@ -58,7 +58,7 @@ describe("ShopItem controller", () => {
     res.send = jest.fn();
 
     await shopItemController.findAllByName(req, res);
-console.log(where);
+    
     expect(findAll).toHaveBeenCalledTimes(1);
     expect(findAll).toHaveBeenCalledWith({ where });
     expect(res.status).toHaveBeenCalledTimes(1);
